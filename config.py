@@ -13,6 +13,10 @@ class Config:
     # referrals
     REFERRAL_GOLD_QTY = int(os.getenv("REFERRAL_GOLD_QTY"))
 
+    # telegram
+    TOKEN = os.getenv("TOKEN")
+    WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+
     def get_db_url(self):
         """
         Construct the database URL from the configuration.
