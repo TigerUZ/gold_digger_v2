@@ -10,6 +10,9 @@ class Config:
     DB_HOST = os.getenv("DB_HOST")
     DB_DATABASE = os.getenv("DB_DATABASE")
 
+    # referrals
+    REFERRAL_GOLD_QTY = int(os.getenv("REFERRAL_GOLD_QTY"))
+
     def get_db_url(self):
         """
         Construct the database URL from the configuration.
