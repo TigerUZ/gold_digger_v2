@@ -15,7 +15,13 @@ class Config:
 
     # telegram
     TOKEN = os.getenv("TOKEN")
-    WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+    APP_URL = os.getenv("APP_URL")
+
+    def get_webhook_url(self):
+        """
+        Construct the webhook URL from the configuration.
+        """
+        return f"{self.APP_URL}/webhook"
 
     def get_db_url(self):
         """
