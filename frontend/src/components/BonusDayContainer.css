@@ -1,0 +1,42 @@
+.bonus-day-section {
+    margin: 1rem;
+    padding: 1rem;
+    box-sizing: border-box;
+    border: 2px solid var(--color-black);
+    border-radius: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: calc(100vw - 2px - 2rem);
+}
+
+.bonus-day-section-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.bonus-day-section-timer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    background-color: var(--color-black);
+    margin-top: 1rem;
+    border: 2px solid var(--color-black);
+    border-radius: 1.5rem;
+    width: 100%;
+    color: var(--color-white);
+}
+
+.bonus-day-section-timer-container p {
+    margin: 0;
+}
+
+.bonus-day-section-timer {
+    font-size: 2rem;
+    font-weight: bold;
+    padding:.5rem 0;
+}

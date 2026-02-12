@@ -1,0 +1,27 @@
+{
+    "Home": {
+        "type": 1,
+        "left": {
+            "value": 0
+        },
+        "middle": {
+            "header": "TOTAL SCORE",
+            "score": 0
+        },
+        "right": {
+            "value": 0
+        }
+    },
+    "Earnings": {
+        "type": 2,
+        "header": "EARNINGS"
+    },
+    "Friends": {
+        "type": 2,
+        "header": "FRIENDS"
+    },
+    "Wallet": {
+        "type": 2,
+        "header": "WALLET"
+    }
+}

@@ -1,0 +1,45 @@
+.bonus-day-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-basis: 25%;
+}
+
+.bonus-day-container h3 {
+    margin: .25rem;
+    text-align: center;
+}
+
+.bonus-day-text-icon-container {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bonus-day-text {
+    line-height: 4rem;
+    text-align: center;
+    width: 4rem;
+    height: 4rem;
+    background-color: var(--color-white);
+    color: var(--color-black);
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 0.5rem;
+
+}
+
+.bonus-day-text-icon-container svg {
+    position: absolute;
+    bottom: -1rem;
+}
+
+.not-active {
+    filter: grayscale(100%);
+}
+
+.selected {
+    background-color: var(--color-blue);
+}
