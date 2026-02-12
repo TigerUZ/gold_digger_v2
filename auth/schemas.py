@@ -1,7 +1,6 @@
-from typing import List
+from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
-from datetime import datetime
 
 class GameMechanicSchema(BaseModel):
     user_id: int
@@ -30,9 +29,8 @@ class UserSchema(BaseModel):
     last_name: str | None
     referral_code: str
 
-    # relationships
+    # relationship (eager-loaded in queries)
     game_mechanic: GameMechanicSchema
-    referrals_made: List[ReferralSchema | None]
 
     model_config = ConfigDict(from_attributes=True)
 

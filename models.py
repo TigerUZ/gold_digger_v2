@@ -20,18 +20,27 @@ class User(Base):
 
 
     # relationships
-    game_mechanic = relationship("GameMechanic", back_populates="user", cascade="all, delete-orphan", uselist=False)
+    # Use selectin to avoid async lazy-load (MissingGreenlet)
+    game_mechanic = relationship(
+        "GameMechanic",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        uselist=False,
+        lazy="selectin",
+    )
     referrals_made = relationship(
         "Referral",
         foreign_keys="[Referral.referral_master_id]",
         back_populates="referral_master",
         cascade="all, delete-orphan",
+        lazy="selectin",
     )
     referrals_received = relationship(
         "Referral",
         foreign_keys="[Referral.referral_user_id]",
         back_populates="referral_user",
         cascade="all, delete-orphan",
+        lazy="selectin",
     )
 
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -46,7 +55,7 @@ class GameMechanic(Base):
 
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     total_gold: Mapped[int] = mapped_column(Integer, default=0)
-    lives: Mapped[int] = mapped_column(Integer, default=6)
+    lives: Mapped[int] = mapped_column(Integer, default=5)
     rounds_played: Mapped[int] = mapped_column(Integer, default=0)
     best_round_gold: Mapped[int] = mapped_column(Integer, default=0)
     last_round_played_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)

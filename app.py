@@ -39,6 +39,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router)
 app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
+app.mount("/img", StaticFiles(directory="frontend/dist/img"), name="img")
 
 
 # Маршрут для обработки вебхуков

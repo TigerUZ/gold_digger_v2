@@ -1,16 +1,17 @@
-from urllib.parse import parse_qs
-from config import config
-import hashlib
-import hmac
-from fastapi.exceptions import HTTPException
-from fastapi import status
+from __future__ import annotations
+
+from datetime import datetime, timezone
 from uuid import uuid4
-from models import User, GameMechanic
-from aiogram.utils.web_app import safe_parse_webapp_init_data, WebAppInitData
+
+from aiogram.utils.web_app import WebAppInitData, safe_parse_webapp_init_data
+from fastapi import HTTPException, status
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import selectinload
+
+from config import config
 from database import SessionDep
+from models import GameMechanic, User
 
 
 # verification of telegram user
@@ -22,7 +23,13 @@ async def verify_telegram_init_data(init_data_raw: str) -> WebAppInitData:
         )
         return validated_data
     except ValueError as e:
-        print("Init data validation failed:", e)
+        # IMPORTANT: return proper HTTP error instead of silently returning None
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Telegram initData")
+
+
+def utcnow_naive() -> datetime:
+    """UTC now without tzinfo (fits TIMESTAMP WITHOUT TIME ZONE)."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 # creation of referral code
@@ -33,7 +40,8 @@ async def create_referral_code() -> str:
 # looking for user in database
 async def get_user_from_db(user_id: int, session: SessionDep):
     try:
-        query = select(User).where(User.id == user_id).options(selectinload(User.game_mechanic), selectinload(User.referrals_made))
+        # eager-load game_mechanic to avoid MissingGreenlet in async
+        query = select(User).where(User.id == user_id).options(selectinload(User.game_mechanic))
         query_data = await session.execute(query)
         user_data = query_data.scalar_one_or_none()
 
@@ -55,12 +63,17 @@ async def create_user_in_db(user_data: WebAppInitData, session: SessionDep) -> U
 
     new_game_mechanic = GameMechanic(
         user_id=new_user.id,
-        user=new_user
+        user=new_user,
+        lives=5,
+        last_round_played_at=None,
     )
 
     try:
         session.add(new_user)
+        session.add(new_game_mechanic)
         await session.commit()
+        # Reload with relationships
+        await session.refresh(new_user)
     except SQLAlchemyError as e:
         print(e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not create new user")
