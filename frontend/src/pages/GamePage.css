@@ -1,7 +1,91 @@
-.home_main_page{
-    background: url("img/home/home_page_background.png");
-    background-repeat:  no-repeat;
-    background-position: center center;
-    background-size: auto 100%;
-    height:100vh;
+.home_main_page {
+  min-height: 100vh;
+  padding-top: 90px;
+}
+
+.game-ui {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+}
+
+.game-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.game-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+  min-width: 90px;
+}
+
+.game-stat .label {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.game-stat .value {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 92px);
+  grid-template-rows: repeat(3, 92px);
+  gap: 12px;
+}
+
+.hole {
+  width: 92px;
+  height: 92px;
+  border-radius: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.hole.active {
+  border-color: rgba(255, 215, 0, 0.7);
+}
+
+.mole {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 215, 0, 0.95);
+  box-shadow: 0 4px 18px rgba(255, 215, 0, 0.35);
+}
+
+.game-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.start-btn,
+.stop-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-weight: 700;
+}
+
+.start-btn:disabled {
+  opacity: 0.6;
+}
+
+.game-message {
+  opacity: 0.9;
+  text-align: center;
+  max-width: 320px;
 }
