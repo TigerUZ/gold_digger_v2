@@ -7,6 +7,7 @@ import GamePage from "./pages/GamePage.jsx";
 import EarningsPage from "./pages/EarningsPage.jsx";
 import FriendsPage from "./pages/FriendsPage.jsx";
 import WalletPage from "./pages/WalletPage.jsx";
+import StartPage from "./pages/StartPage.jsx";
 
 import headersTemplate from "./assets/headers.json";
 
@@ -98,6 +99,7 @@ function App() {
     <>
       <Router>
         <Routes>
+          <Route path="/" element={<StartPage />} />
           <Route
             path="/game"
             element={<GamePage header_info={header_info} apiFetch={apiFetch} user={user} refreshUser={refreshUser} />}
@@ -109,7 +111,7 @@ function App() {
           <Route path="/friends" element={<FriendsPage header_info={header_info} />} />
           <Route path="/wallet" element={<WalletPage header_info={header_info} />} />
 
-          <Route path="*" element={<Navigate to="/game" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Navbar />
       </Router>

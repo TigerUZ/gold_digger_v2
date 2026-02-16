@@ -1,6 +1,41 @@
 .home_main_page {
+  position: relative;
   min-height: 100vh;
-  padding-top: 90px;
+  overflow: hidden;
+}
+
+/* Фон */
+.home_main_page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image: url("/img/game/game_background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  filter: blur(2px);      /* было 6px → теперь мягко */
+  transform: scale(1.02); /* минимальное увеличение */
+
+  z-index: 0;
+}
+
+/* Очень лёгкое затемнение */
+.home_main_page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.2); /* было 0.35 */
+
+  z-index: 1;
+}
+
+/* Контент поверх */
+.home_main_page > * {
+  position: relative;
+  z-index: 2;
 }
 
 .game-ui {
