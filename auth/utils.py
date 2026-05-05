@@ -22,7 +22,7 @@ async def verify_telegram_init_data(init_data_raw: str) -> WebAppInitData:
             init_data=init_data_raw
         )
         return validated_data
-    except ValueError as e:
+    except ValueError:
         # IMPORTANT: return proper HTTP error instead of silently returning None
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Telegram initData")
 
