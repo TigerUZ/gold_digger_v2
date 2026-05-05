@@ -1,0 +1,31 @@
+:root {
+  font-family: Arial, sans-serif;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --color-black: #26272d;
+  --color-white: #dad6be;
+  --color-red: #ff1b1c;
+  --color-blue: #01BAEF;
+  --color-orange: #FACC15;
+  background-color: white;
+}
+
+
+
+
+/*@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}*/

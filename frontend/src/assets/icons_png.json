@@ -1,0 +1,24 @@
+{
+  "navbar": [
+    {
+      "name": "game icon",
+      "link": "/game",
+      "url": "img/navbar/home_icon.png"
+    },
+    {
+      "name": "earnings icon",
+      "link": "/earnings",
+      "url": "img/navbar/earnings_icon.png"
+    },
+    {
+      "name": "friends icon",
+      "link": "/friends",
+      "url": "img/navbar/friends_icon.png"
+    },
+    {
+      "name": "wallet icon",
+      "link": "/wallet",
+      "url": "img/navbar/wallet_icon.png"
+    }
+  ]
+}
