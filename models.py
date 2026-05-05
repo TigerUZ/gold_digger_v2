@@ -1,7 +1,5 @@
 from datetime import datetime
-from idlelib.macosx import readSystemPreferences
-
-from sqlalchemy import Integer, BigInteger, String, Date, ForeignKey, Boolean, DateTime
+from sqlalchemy import Integer, BigInteger, String, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import Base
 from config import config
