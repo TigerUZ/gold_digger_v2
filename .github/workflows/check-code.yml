@@ -21,8 +21,21 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff pytest mypy
+          pip install ruff pytest pytest-asyncio httpx
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Check Style and Syntax (Linter)
         run: ruff check --exclude ./migrations .
+
+      - name: Run tests
+        env:
+          DB_USER: test
+          DB_PASSWORD: test
+          DB_PORT: "5432"
+          DB_HOST: localhost
+          DB_DATABASE: test_db
+          REFERRAL_GOLD_QTY: "500"
+          TOKEN: "0000000000:TEST_TOKEN_FOR_CI"
+          APP_URL: https://example.com
+          BOT_USERNAME: gold_digger_test_bot
+        run: pytest -q
