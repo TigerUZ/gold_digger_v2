@@ -70,6 +70,13 @@ class GameMechanic(Base):
     #             f"Daily bonus step: {self.daily_bonus_step} | Daily bonus last taken: {self.daily_bonus_last_taken_at}")
 
 
+class PendingReferral(Base):
+    __tablename__ = "pending_referrals"
+
+    user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    referral_code: Mapped[str] = mapped_column(String, nullable=False)
+
+
 class Referral(Base):
     __tablename__ = "referrals"
 

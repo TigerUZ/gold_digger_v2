@@ -16,6 +16,9 @@ class Config:
     # telegram
     TOKEN = os.getenv("TOKEN")
     APP_URL = os.getenv("APP_URL")
+    BOT_USERNAME = os.getenv("BOT_USERNAME", "")
+    # Short name of Main Mini App from BotFather (e.g. "golddigger")
+    BOT_WEBAPP_SHORT_NAME = os.getenv("BOT_WEBAPP_SHORT_NAME", "")
 
     def get_webhook_url(self):
         """

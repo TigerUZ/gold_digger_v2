@@ -11,19 +11,17 @@ from sqlalchemy.orm import selectinload
 
 from config import config
 from database import SessionDep
-from models import GameMechanic, User
+from models import GameMechanic, PendingReferral, Referral, User
 
 
-# verification of telegram user
 async def verify_telegram_init_data(init_data_raw: str) -> WebAppInitData:
     try:
         validated_data = safe_parse_webapp_init_data(
             token=config.TOKEN,
-            init_data=init_data_raw
+            init_data=init_data_raw,
         )
         return validated_data
     except ValueError:
-        # IMPORTANT: return proper HTTP error instead of silently returning None
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Telegram initData")
 
 
@@ -32,33 +30,115 @@ def utcnow_naive() -> datetime:
     return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
-# creation of referral code
+def parse_referral_code(start_param: str | None) -> str | None:
+    if not start_param:
+        return None
+    code = start_param.strip()
+    if code.startswith("ref_"):
+        code = code[4:]
+    return code or None
+
+
+async def save_pending_referral(user_id: int, start_param: str, session: SessionDep) -> None:
+    code = parse_referral_code(start_param)
+    if not code:
+        return
+
+    existing = await session.get(PendingReferral, user_id)
+    if existing:
+        existing.referral_code = code
+    else:
+        session.add(PendingReferral(user_id=user_id, referral_code=code))
+    await session.commit()
+
+
+async def consume_pending_referral(user_id: int, session: SessionDep) -> str | None:
+    pending = await session.get(PendingReferral, user_id)
+    if not pending:
+        return None
+    code = pending.referral_code
+    await session.delete(pending)
+    await session.commit()
+    return code
+
+
+async def link_referral_by_code(
+    code: str,
+    new_user: User,
+    session: SessionDep,
+    game_mechanic: GameMechanic | None = None,
+) -> None:
+    if not code or code == new_user.referral_code:
+        return
+
+    existing_q = select(Referral).where(Referral.referral_user_id == new_user.id)
+    if (await session.execute(existing_q)).scalar_one_or_none():
+        return
+
+    master_q = (
+        select(User)
+        .where(User.referral_code == code, User.is_deleted.is_(False))
+        .options(selectinload(User.game_mechanic))
+    )
+    master = (await session.execute(master_q)).scalar_one_or_none()
+    if not master or master.id == new_user.id:
+        return
+
+    referral = Referral(
+        referral_master_id=master.id,
+        referral_user_id=new_user.id,
+        referral_gain_gold=config.REFERRAL_GOLD_QTY,
+    )
+    session.add(referral)
+
+    if master.game_mechanic:
+        master.game_mechanic.total_gold += config.REFERRAL_GOLD_QTY
+        session.add(master.game_mechanic)
+
+    if game_mechanic:
+        game_mechanic.total_gold += config.REFERRAL_GOLD_QTY
+        session.add(game_mechanic)
+
+
+async def link_referral_if_applicable(
+    user_data: WebAppInitData,
+    new_user: User,
+    session: SessionDep,
+    game_mechanic: GameMechanic | None = None,
+) -> None:
+    code = parse_referral_code(user_data.start_param)
+    if not code:
+        code = await consume_pending_referral(new_user.id, session)
+    if not code:
+        return
+
+    await link_referral_by_code(code, new_user, session, game_mechanic)
+
+
 async def create_referral_code() -> str:
     return str(uuid4())
 
 
-# looking for user in database
 async def get_user_from_db(user_id: int, session: SessionDep):
     try:
-        # eager-load game_mechanic to avoid MissingGreenlet in async
         query = select(User).where(User.id == user_id).options(selectinload(User.game_mechanic))
         query_data = await session.execute(query)
-        user_data = query_data.scalar_one_or_none()
-
-        return user_data
+        return query_data.scalar_one_or_none()
     except SQLAlchemyError as e:
         print(e)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not load data from database")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not load data from database",
+        )
 
 
-# creating new user
 async def create_user_in_db(user_data: WebAppInitData, session: SessionDep) -> User:
     new_user = User(
         id=user_data.user.id,
         username=user_data.user.username,
         first_name=user_data.user.first_name,
         last_name=user_data.user.last_name,
-        referral_code=await create_referral_code()
+        referral_code=await create_referral_code(),
     )
 
     new_game_mechanic = GameMechanic(
@@ -71,32 +151,14 @@ async def create_user_in_db(user_data: WebAppInitData, session: SessionDep) -> U
     try:
         session.add(new_user)
         session.add(new_game_mechanic)
+        await link_referral_if_applicable(user_data, new_user, session, new_game_mechanic)
         await session.commit()
-        # Reload with relationships
         await session.refresh(new_user)
     except SQLAlchemyError as e:
         print(e)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not create new user")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not create new user",
+        )
 
     return new_user
-
-    # # parsing query string
-    # parsed = parse_qs(init_data, keep_blank_values=True)
-    # data_dict = {k: v[0] for k, v in parsed.items()}
-    # hash_received = data_dict.pop("hash", None)
-    #
-    # # building string for checking
-    # data_check_arr = [f"{k}={v}" for k, v in sorted(data_dict.items())]
-    # data_check_string = "\n".join(data_check_arr)
-    #
-    # #secret key is SHA256 of bot token
-    # secret_key = hashlib.sha256(config.TOKEN.encode("utf-8")).digest()
-    # computed_hash = hmac.new(secret_key, data_check_string.encode("utf-8"), hashlib.sha256).hexdigest()
-    #
-    # print(f"Hash comparing: \n{computed_hash}\n{hash_received}\n")
-    #
-    # if computed_hash != hash_received:
-    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Incorrect init_data")
-    #
-    # return data_dict
-
