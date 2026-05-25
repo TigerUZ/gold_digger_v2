@@ -1,5 +1,7 @@
+@import "./styles/ui.css";
+
 :root {
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -11,21 +13,7 @@
   --color-red: #ff1b1c;
   --color-blue: #01BAEF;
   --color-orange: #FACC15;
+  --color-green: #4ade80;
+  --color-brown: #8B5E3C;
   background-color: white;
 }
-
-
-
-
-/*@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}*/

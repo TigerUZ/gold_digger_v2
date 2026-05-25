@@ -1,42 +1,121 @@
 .bonus-day-section {
-    margin: 1rem;
-    padding: 1rem;
-    box-sizing: border-box;
-    border: 2px solid var(--color-black);
-    border-radius: 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: calc(100vw - 2px - 2rem);
+  width: 100%;
+  margin: 0;
+  padding: 1.2rem;
+  box-sizing: border-box;
+  border: 3px solid var(--color-black);
+  border-radius: var(--radius-xl);
+  background: var(--panel-bg);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-soft), var(--shadow-glow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.bonus-day-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.bonus-day-section-header {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bonus-day-section-header::after {
+  content: "🎁";
+  display: block;
+  font-size: 1.5rem;
+  margin-top: 0.25rem;
+}
+
+.bonus-day-section-sub {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 1rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
 }
 
 .bonus-day-section-container {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    width: 100%;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  width: 100%;
 }
 
 .bonus-day-section-timer-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem;
-    box-sizing: border-box;
-    background-color: var(--color-black);
-    margin-top: 1rem;
-    border: 2px solid var(--color-black);
-    border-radius: 1.5rem;
-    width: 100%;
-    color: var(--color-white);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.1rem;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #454752 0%, var(--color-black) 100%);
+  margin-top: 1.1rem;
+  border: 2px solid var(--color-black);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  color: var(--color-white);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .bonus-day-section-timer-container p {
-    margin: 0;
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  opacity: 0.9;
 }
 
 .bonus-day-section-timer {
-    font-size: 2rem;
-    font-weight: bold;
-    padding:.5rem 0;
+  font-size: 2.1rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  padding: 0.45rem 0;
+  color: var(--color-orange);
+  text-shadow: 0 2px 8px rgba(250, 204, 21, 0.4);
+  letter-spacing: 0.05em;
+}
+
+.bonus-claim-btn {
+  margin-top: 0.85rem;
+  padding: 0.85rem 1.75rem;
+  border: 2px solid var(--color-black);
+  border-radius: var(--radius-md);
+  background: var(--gold-gradient);
+  color: var(--color-black);
+  font-weight: 900;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-lift);
+  transition: transform 0.12s ease;
+  animation: ui-pulse-glow 2s ease-in-out infinite;
+}
+
+.bonus-claim-btn:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--color-black);
+}
+
+.bonus-claim-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  animation: none;
 }

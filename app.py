@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from aiogram.types import Update, MenuButtonWebApp, WebAppInfo
 
 from config import config
@@ -40,6 +40,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router)
 app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
 app.mount("/img", StaticFiles(directory="frontend/dist/img"), name="img")
+app.mount("/sounds", StaticFiles(directory="frontend/dist/sounds"), name="sounds")
 
 
 # Маршрут для обработки вебхуков
@@ -56,5 +57,11 @@ async def webhook(request: Request) -> None:
 
 @app.get("/")
 async def initialize(request: Request, response_class=HTMLResponse):
+    username = config.BOT_USERNAME.lstrip("@")
+    start_param = request.query_params.get("tgWebAppStartParam") or request.query_params.get("ref")
+    if username and start_param:
+        code = start_param if start_param.startswith("ref_") else f"ref_{start_param}"
+        return RedirectResponse(url=f"https://t.me/{username}?start={code}")
+
     with open("frontend/dist/index.html", "r") as file:
         return HTMLResponse(content=file.read())

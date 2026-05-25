@@ -1,7 +1,62 @@
-.friends-content-container {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: calc(100vh - 8rem);
+.friends-card {
+  text-align: left;
+}
+
+.friends-stats {
+  margin-bottom: 1rem;
+}
+
+.friends-link-label {
+  margin: 0 0 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.friends-link-box {
+  margin-bottom: 1rem;
+}
+
+.friends-link {
+  margin: 0;
+}
+
+.friends-actions {
+  margin-top: 0.25rem;
+}
+
+.friends-list-panel .ui-panel-title {
+  font-size: 1rem;
+}
+
+.friends-list-panel .ui-panel-title::after {
+  width: 2rem;
+}
+
+.friends-empty {
+  margin: 0;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius-md);
+}
+
+.friends-page .ui-message {
+  margin-top: 0.85rem;
+}
+
+.friends-card .ui-panel-title::after {
+  content: "🤝";
+  display: block;
+  width: auto;
+  height: auto;
+  margin: 0.35rem 0 0;
+  border: none;
+  background: none;
+  font-size: 1.35rem;
 }

@@ -1,0 +1,168 @@
+/* 4-layer hole: pit → back grass → mole → front rim */
+
+.mole-field {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 0.65rem;
+  overflow: hidden;
+}
+
+.mole-field__lawn {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+  padding: 0.4rem;
+  box-sizing: border-box;
+  background-color: #3fa842;
+  background-size: cover;
+  background-position: center;
+}
+
+.mole-cell {
+  position: relative;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  min-height: 0;
+  min-width: 0;
+}
+
+.mole-cell:active:not(.mole-cell--whacked) .mole-cell__stack {
+  transform: scale(0.97);
+}
+
+.mole-cell__stack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.08s ease;
+  transform-origin: center center;
+}
+
+.mole-cell__layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.mole-cell__hole-back {
+  z-index: 1;
+}
+
+.mole-cell__hole-top {
+  z-index: 2;
+}
+
+.mole-cell__hole-rim {
+  z-index: 4;
+}
+
+.mole-cell__mole {
+  position: absolute;
+  left: 50%;
+  bottom: 21%;
+  width: 64%;
+  height: auto;
+  z-index: 3;
+  pointer-events: none;
+  user-select: none;
+  transform: translate(-50%, 28%) scale(0.82);
+  will-change: transform;
+  animation: mole-rise 0.26s cubic-bezier(0.22, 1.06, 0.36, 1) forwards,
+    mole-idle 0.9s ease-in-out 0.26s infinite;
+}
+
+.mole-cell--active .mole-cell__mole {
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.28));
+}
+
+.mole-cell__mole--whacked {
+  z-index: 5;
+  animation: mole-whacked 0.32s ease-out forwards;
+}
+
+.mole-cell--whacked .mole-cell__stack {
+  animation: cell-hit 0.18s ease-out;
+}
+
+@keyframes mole-rise {
+  0% {
+    transform: translate(-50%, 28%) scale(0.82);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes mole-idle {
+  0%, 100% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -3px) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes mole-whacked {
+  0% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+  25% {
+    transform: translate(-50%, -8px) scale(1.04);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -2px) scale(0.72);
+    opacity: 0;
+  }
+}
+
+@keyframes cell-hit {
+  0% { transform: scale(1); }
+  45% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.mole-cell__coin {
+  position: absolute;
+  left: 50%;
+  top: 4%;
+  width: 30%;
+  height: auto;
+  transform: translateX(-50%);
+  pointer-events: none;
+  user-select: none;
+  z-index: 5;
+  animation: coin-pop 0.5s cubic-bezier(0.22, 1.12, 0.36, 1) forwards;
+}
+
+@keyframes coin-pop {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.25) translateY(8px);
+  }
+  35% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.05) translateY(-4px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.88) translateY(-16px);
+  }
+}

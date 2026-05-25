@@ -8,6 +8,9 @@ import EarningsPage from "./pages/EarningsPage.jsx";
 import FriendsPage from "./pages/FriendsPage.jsx";
 import WalletPage from "./pages/WalletPage.jsx";
 import StartPage from "./pages/StartPage.jsx";
+import TelegramGate from "./components/TelegramGate.jsx";
+import AudioRouter from "./components/AudioRouter.jsx";
+import SoundToggle from "./components/SoundToggle.jsx";
 
 import headersTemplate from "./assets/headers.json";
 
@@ -79,6 +82,15 @@ function App() {
     })();
   }, [initData, apiFetch, refreshUser]);
 
+  // Periodic refresh for lives timer
+  useEffect(() => {
+    if (!initData) return undefined;
+    const interval = setInterval(() => {
+      refreshUser();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [initData, refreshUser]);
+
   const header_info = useMemo(() => {
     const h = JSON.parse(JSON.stringify(headersTemplate));
     if (user?.game_mechanic) {
@@ -96,26 +108,36 @@ function App() {
   }, [user, nextLifeIn]);
 
   return (
-    <>
+    <TelegramGate>
       <Router>
+        <AudioRouter />
         <Routes>
           <Route path="/" element={<StartPage />} />
           <Route
             path="/game"
-            element={<GamePage header_info={header_info} apiFetch={apiFetch} user={user} refreshUser={refreshUser} />}
+            element={
+              <GamePage
+                header_info={header_info}
+                apiFetch={apiFetch}
+                user={user}
+                refreshUser={refreshUser}
+                nextLifeIn={nextLifeIn}
+              />
+            }
           />
           <Route
             path="/earnings"
-            element={<EarningsPage header_info={header_info} apiFetch={apiFetch} />}
+            element={<EarningsPage header_info={header_info} apiFetch={apiFetch} refreshUser={refreshUser} />}
           />
-          <Route path="/friends" element={<FriendsPage header_info={header_info} />} />
-          <Route path="/wallet" element={<WalletPage header_info={header_info} />} />
+          <Route path="/friends" element={<FriendsPage header_info={header_info} apiFetch={apiFetch} />} />
+          <Route path="/wallet" element={<WalletPage header_info={header_info} apiFetch={apiFetch} />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Navbar />
+        <SoundToggle />
       </Router>
-    </>
+    </TelegramGate>
   );
 }
 

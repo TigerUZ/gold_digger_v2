@@ -1,77 +1,83 @@
 header {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    color: var(--color-white);
-    height: 5rem;
-    z-index: 1;
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-white);
+  height: 5rem;
+  z-index: 100;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
 }
 
-header img{
-    position: absolute;
-    height: 5rem;
+header img {
+  position: absolute;
+  height: 5rem;
 }
 
 .header_container p {
-    padding: 0;
-    margin: 0;
+  padding: 0;
+  margin: 0;
+  font-weight: 800;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .header_container h3 {
-    padding: 0;
-    margin: 0;
-    color: var(--color-orange);
-    text-shadow: 2px 2px 5px black;
+  padding: 0;
+  margin: 0;
+  color: var(--color-orange);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  font-weight: 900;
+  letter-spacing: 0.04em;
 }
 
 .header_container {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    max-width: 340px;
-    height: 5rem;
-    flex: 1;
-    padding: 0;
-    margin: 0;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  max-width: 340px;
+  height: 5rem;
+  flex: 1;
+  padding: 0;
+  margin: 0;
 }
 
-.header_edges{
-    display: flex;
-    flex: 1;
-    text-align: right;
-    height: calc(5rem - 2px);
-    align-items: center;;
-    justify-content: right;
-    padding: 0 30px 0 0;
-    box-sizing: content-box;
-    margin: 0;
-
+.header_edges {
+  display: flex;
+  flex: 1;
+  text-align: right;
+  height: calc(5rem - 2px);
+  align-items: center;
+  justify-content: right;
+  padding: 0 30px 0 0;
+  box-sizing: content-box;
+  margin: 0;
+  font-size: 1.1rem;
 }
-
 
 .header_middle {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .header_middle p {
-    font-weight: bold;
+  font-weight: 900;
+  font-size: 1.15rem;
 }
 
 .header_container h2 {
-    display: flex;
-    height: 5rem;
-    align-items: center;
-    padding: 0;
-    margin:0;
-    color: var(--color-orange);
-    text-shadow: 2px 2px 5px black;
-
+  display: flex;
+  height: 5rem;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  color: var(--color-orange);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  font-weight: 900;
+  letter-spacing: 0.06em;
 }

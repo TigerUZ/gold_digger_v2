@@ -1,0 +1,50 @@
+.telegram-gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: var(--color-black);
+  color: var(--color-white);
+  box-sizing: border-box;
+}
+
+.telegram-gate-card {
+  max-width: 360px;
+  border: 2px solid var(--color-orange);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.telegram-gate-card h1 {
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
+}
+
+.telegram-gate-card p {
+  margin: 0 0 1rem;
+  line-height: 1.45;
+  font-size: 0.95rem;
+}
+
+.telegram-gate-btn {
+  display: inline-block;
+  padding: 0.85rem 1.25rem;
+  border-radius: 1rem;
+  background: var(--color-orange);
+  color: var(--color-black);
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.telegram-gate-steps {
+  margin-top: 1rem !important;
+  font-size: 0.85rem;
+  opacity: 0.9;
+  text-align: left;
+}
+
+.telegram-gate-hint {
+  color: var(--color-orange);
+}

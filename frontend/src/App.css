@@ -8,6 +8,16 @@ body {
     margin: 0 auto;
 
 }
+
+.space-for-navbar {
+  height: 6rem;
+  width: 100%;
+}
+
+.space-for-header {
+  height: 4rem;
+  width: 100%;
+}
 /*
 .logo {
   height: 6em;
