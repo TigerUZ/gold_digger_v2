@@ -10,7 +10,6 @@ from database import SessionDep
 from models import GameMechanic, Referral, User
 from auth.bot_info import build_referral_link, get_bot_username
 from auth.schemas import UserSchema
-from config import config
 from auth.utils import (
     create_referral_code,
     create_user_in_db,
