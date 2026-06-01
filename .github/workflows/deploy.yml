@@ -1,0 +1,74 @@
+name: Deploy to VPS
+
+on:
+  workflow_run:
+    workflows: ["Python Code Check"]
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Backup env
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            mkdir -p "${{ secrets.DEPLOY_PATH }}"
+            if [ -f "${{ secrets.DEPLOY_PATH }}/.env" ]; then
+              cp "${{ secrets.DEPLOY_PATH }}/.env" /tmp/gold_digger.env.bak
+            fi
+
+      - name: Upload files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          source: "."
+          target: ${{ secrets.DEPLOY_PATH }}
+          strip_components: 0
+          overwrite: true
+
+      - name: Restore env
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            if [ -f /tmp/gold_digger.env.bak ]; then
+              cp /tmp/gold_digger.env.bak "${{ secrets.DEPLOY_PATH }}/.env"
+            fi
+
+      - name: Deploy
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -e
+            cd "${{ secrets.DEPLOY_PATH }}"
+            chmod +x scripts/deploy.sh
+            ./scripts/deploy.sh

@@ -1,0 +1,12 @@
+.git
+.github
+.venv
+__pycache__
+*.pyc
+.env
+.idea
+.DS_Store
+frontend/node_modules
+tests
+pytest.ini
+DEPLOY.md
