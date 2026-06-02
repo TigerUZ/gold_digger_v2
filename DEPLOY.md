@@ -153,3 +153,24 @@ push в main → CI (ruff + pytest) → Deploy:
 cd /opt/gold_digger_v2
 ./scripts/deploy.sh
 ```
+
+## Ошибка деплоя: `KeyError: 'ContainerConfig'`
+
+Старый `docker-compose` (1.29) несовместим с новым Docker при **recreate** контейнера.
+
+**Сразу на VPS (один раз):**
+
+```bash
+cd /opt/gold_digger_v2
+docker-compose down
+docker-compose up -d --build
+```
+
+**Надёжнее — поставить Compose v2** (после этого `deploy.sh` сам выберет `docker compose`):
+
+```bash
+apt-get update && apt-get install -y docker-compose-plugin
+docker compose version
+```
+
+Обновлённый `scripts/deploy.sh` перед `up` делает `docker-compose down`, чтобы обойти баг без ручных команд.
