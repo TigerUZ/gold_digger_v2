@@ -156,6 +156,26 @@ function MinesPage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
     return () => clearInterval(tickRef.current);
   }, [isPlaying, cashout, forfeit, endPlaying]);
 
+  const applyStartState = (data) => {
+    setSessionId(data.session_id);
+    sessionIdRef.current = data.session_id;
+    setIsPlaying(true);
+    setTimeLeft(data.seconds_left ?? ROUND_SECONDS);
+    setMaxOpens(data.max_opens ?? 7);
+    setOpensCount(data.opens_count ?? 0);
+    setSessionGold(data.gold_in_session ?? 0);
+    const next = Array(25).fill("hidden");
+    for (const item of data.opened_preview || []) {
+      const kind = item.kind || item;
+      const cell = typeof item.cell === "number" ? item.cell : null;
+      if (cell === null || cell < 0 || cell > 24) continue;
+      if (kind === "gold") next[cell] = "gold";
+      else if (kind === "mine") next[cell] = "mine";
+      else next[cell] = "empty";
+    }
+    setCells(next);
+  };
+
   const startGame = async () => {
     audio.unlock();
     setMessage("");
@@ -163,21 +183,23 @@ function MinesPage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
     try {
       const data = await apiFetch("/mines/start", { method: "POST" });
       await refreshUser();
-      setSessionId(data.session_id);
-      sessionIdRef.current = data.session_id;
-      setIsPlaying(true);
-      setTimeLeft(data.seconds_left ?? ROUND_SECONDS);
-      setMaxOpens(data.max_opens ?? 7);
-      setOpensCount(0);
-      setSessionGold(0);
-      setCells(Array(25).fill("hidden"));
+      applyStartState(data);
+      if (data.resumed) {
+        setMessage("Продолжаем игру");
+      }
       audio.playGameMusic();
     } catch (e) {
-      const wait = e?.body?.next_life_in_seconds || e?.body?.detail?.next_life_in_seconds;
+      const detail = e?.body?.detail;
+      const wait =
+        e?.body?.next_life_in_seconds ||
+        (typeof detail === "object" ? detail?.next_life_in_seconds : null);
       if (e.status === 403 && wait) {
         setMessage(`Жизни закончились. Следующая через ~${Math.ceil(wait / 60)} мин.`);
+      } else if (e.status >= 500) {
+        setMessage("Ошибка сервера. Подожди минуту и попробуй снова.");
       } else {
-        setMessage("Не удалось начать игру.");
+        const msg = typeof detail === "object" ? detail?.message : detail;
+        setMessage(msg || "Не удалось начать игру.");
       }
     } finally {
       setBusy(false);
@@ -214,7 +236,7 @@ function MinesPage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
   };
 
   return (
-    <PageBackground image={BACKGROUNDS.mines} className="mines-page" blur>
+    <PageBackground image={BACKGROUNDS.mines} className="mines-page" overlay={false}>
       <Header header_info={header_info} title="Home" />
       <div className="space-for-header" />
 

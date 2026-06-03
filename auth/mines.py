@@ -53,6 +53,18 @@ def _parse_opened(raw: str) -> list[int]:
         return []
 
 
+def _cell_kind(cell_type: str) -> str:
+    if cell_type == "mine":
+        return "mine"
+    if cell_type.startswith("gold_"):
+        return "gold"
+    return "empty"
+
+
+def _opened_preview(board: list[str], opened: list[int]) -> list[OpenedCellPreview]:
+    return [OpenedCellPreview(cell=idx, kind=_cell_kind(board[idx])) for idx in opened]
+
+
 def _seconds_left(session: MinesSession, now: datetime) -> int:
     elapsed = (now - session.started_at).total_seconds()
     return int(max(0, MINES_ROUND_SECONDS - elapsed))
@@ -90,6 +102,11 @@ async def _finish_session(
     return awarded
 
 
+class OpenedCellPreview(BaseModel):
+    cell: int
+    kind: str
+
+
 class MinesStartResponse(BaseModel):
     session_id: str
     lives: int
@@ -97,6 +114,10 @@ class MinesStartResponse(BaseModel):
     next_life_in_seconds: int
     seconds_left: int
     max_opens: int
+    resumed: bool = False
+    opens_count: int = 0
+    gold_in_session: int = 0
+    opened_preview: list[OpenedCellPreview] = Field(default_factory=list)
 
 
 class MinesRevealRequest(BaseModel):
@@ -135,10 +156,24 @@ async def mines_start(request: Request, session: SessionDep):
     if active:
         if _session_expired(active, now):
             await _finish_session(active, mech, session, exploded=False)
+            await session.refresh(mech)
         else:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail={"message": "Finish current treasures game first", "session_id": active.id},
+            board = json.loads(active.board)
+            opened = _parse_opened(active.opened)
+            next_life_in = _sync_lives(mech, now)
+            session.add(mech)
+            await session.commit()
+            return MinesStartResponse(
+                session_id=active.id,
+                lives=mech.lives,
+                max_lives=MAX_LIVES,
+                next_life_in_seconds=next_life_in,
+                seconds_left=_seconds_left(active, now),
+                max_opens=MINES_MAX_OPENS,
+                resumed=True,
+                opens_count=active.opens_count,
+                gold_in_session=active.gold_in_session,
+                opened_preview=_opened_preview(board, opened),
             )
 
     was_full = mech.lives >= MAX_LIVES

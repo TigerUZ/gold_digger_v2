@@ -11,14 +11,13 @@
   padding: 0;
   position: absolute;
   left: 50%;
-  top: 24%;
+  top: 21%;
   transform: translateX(-50%);
-  width: min(78vw, 300px);
-  height: 52%;
+  width: min(80vw, 310px);
+  height: 56%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 2%;
   box-sizing: border-box;
 }
 
@@ -32,18 +31,20 @@
   flex: 1;
   width: 100%;
   margin: 0;
-  padding: 6% 10%;
+  padding: 5% 8% 2%;
   border: none;
   background: transparent;
   cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.15rem;
   position: relative;
 }
 
 .arcade-slot:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 .arcade-slot--soon {
@@ -51,18 +52,30 @@
 }
 
 .arcade-slot__icon {
-  max-width: 100%;
-  max-height: 100%;
+  flex: 1 1 auto;
   width: auto;
   height: auto;
+  max-width: 88%;
+  max-height: 72%;
   object-fit: contain;
+  pointer-events: none;
+}
+
+.arcade-slot__title {
+  flex: 0 0 auto;
+  font-size: clamp(0.8rem, 3.2vw, 1rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #3d2912;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255, 248, 220, 0.85);
   pointer-events: none;
 }
 
 .arcade-slot__badge {
   position: absolute;
-  top: 4%;
-  right: 6%;
+  top: 2%;
+  right: 5%;
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;

@@ -1,4 +1,4 @@
-const CACHE_VERSION = "2";
+const CACHE_VERSION = "3";
 
 function icon(path) {
   return `${path}?v=${CACHE_VERSION}`;

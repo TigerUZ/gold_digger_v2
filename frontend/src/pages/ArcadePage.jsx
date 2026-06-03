@@ -38,6 +38,7 @@ export default function ArcadePage() {
               aria-label={game.title}
             >
               <img className="arcade-slot__icon" src={game.icon} alt="" />
+              <span className="arcade-slot__title">{game.title}</span>
               {game.soon ? <span className="arcade-slot__badge">Скоро</span> : null}
             </button>
           </li>
