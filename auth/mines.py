@@ -3,13 +3,13 @@ from __future__ import annotations
 import json
 import random
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 
-from auth.router import MAX_LIVES, REGEN_SECONDS, _get_current_user, _sync_lives
+from auth.router import MAX_LIVES, _get_current_user, _sync_lives
 from auth.utils import utcnow_naive
 from database import SessionDep
 from models import GameMechanic, MinesSession
