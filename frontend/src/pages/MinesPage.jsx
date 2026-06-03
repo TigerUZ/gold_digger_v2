@@ -215,7 +215,7 @@ function MinesPage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
 
   return (
     <PageBackground image={BACKGROUNDS.mines} className="mines-page" blur>
-      <Header header_info={header_info} title="Сокровища" />
+      <Header header_info={header_info} title="Home" />
       <div className="space-for-header" />
 
       <div className="mines-ui">

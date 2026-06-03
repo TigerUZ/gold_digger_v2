@@ -164,7 +164,7 @@ function GamePage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
 
   return (
     <PageBackground image={BACKGROUNDS.game} className="home_main_page" blur>
-      <Header header_info={header_info} title="Крот" />
+      <Header header_info={header_info} title="Home" />
       <div className="space-for-header" />
 
       <div className="game-ui">
