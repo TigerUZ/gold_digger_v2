@@ -10,7 +10,7 @@ export default function StartPage() {
 
   const handlePlay = () => {
     audio.unlock();
-    navigate("/game");
+    navigate("/arcade");
   };
 
   return (

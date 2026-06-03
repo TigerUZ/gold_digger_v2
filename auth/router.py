@@ -22,7 +22,7 @@ from auth.utils import (
 router = APIRouter()
 
 # Game / energy rules
-MAX_LIVES = 5
+MAX_LIVES = 3
 REGEN_SECONDS = 3 * 60 * 60  # 3 hours
 
 # Daily bonus
@@ -228,8 +228,7 @@ async def me(request: Request, session: SessionDep):
     return MeResponse(user=UserSchema.model_validate(user), max_lives=MAX_LIVES, next_life_in_seconds=next_life_in)
 
 
-@router.post("/game/start", response_model=StartRoundResponse)
-async def game_start(request: Request, session: SessionDep):
+async def _start_mole_round(request: Request, session: SessionDep) -> StartRoundResponse:
     user, mech, next_life_in = await _get_current_user(request, session)
 
     if mech.lives <= 0:
@@ -253,8 +252,17 @@ async def game_start(request: Request, session: SessionDep):
     return StartRoundResponse(lives=mech.lives, max_lives=MAX_LIVES, next_life_in_seconds=next_life_in)
 
 
-@router.post("/game/finish")
-async def game_finish(request: Request, payload: FinishRoundRequest, session: SessionDep):
+@router.post("/mole/start", response_model=StartRoundResponse)
+async def mole_start(request: Request, session: SessionDep):
+    return await _start_mole_round(request, session)
+
+
+@router.post("/game/start", response_model=StartRoundResponse)
+async def game_start(request: Request, session: SessionDep):
+    return await _start_mole_round(request, session)
+
+
+async def _finish_mole_round(request: Request, payload: FinishRoundRequest, session: SessionDep):
     user, mech, _ = await _get_current_user(request, session)
     score = int(payload.score)
 
@@ -272,6 +280,16 @@ async def game_finish(request: Request, payload: FinishRoundRequest, session: Se
         "rounds_played": mech.rounds_played,
         "best_round_gold": mech.best_round_gold,
     }
+
+
+@router.post("/mole/finish")
+async def mole_finish(request: Request, payload: FinishRoundRequest, session: SessionDep):
+    return await _finish_mole_round(request, payload, session)
+
+
+@router.post("/game/finish")
+async def game_finish(request: Request, payload: FinishRoundRequest, session: SessionDep):
+    return await _finish_mole_round(request, payload, session)
 
 
 @router.get("/earnings", response_model=EarningsResponse)

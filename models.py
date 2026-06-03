@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Integer, BigInteger, String, ForeignKey, Boolean, DateTime
+from sqlalchemy import Integer, BigInteger, String, ForeignKey, Boolean, DateTime, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import Base
 from config import config
@@ -53,7 +53,7 @@ class GameMechanic(Base):
 
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     total_gold: Mapped[int] = mapped_column(Integer, default=0)
-    lives: Mapped[int] = mapped_column(Integer, default=5)
+    lives: Mapped[int] = mapped_column(Integer, default=3)
     rounds_played: Mapped[int] = mapped_column(Integer, default=0)
     best_round_gold: Mapped[int] = mapped_column(Integer, default=0)
     last_round_played_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
@@ -96,3 +96,16 @@ class Referral(Base):
         foreign_keys=[referral_user_id],
         back_populates="referrals_received",
     )
+
+
+class MinesSession(Base):
+    __tablename__ = "mines_sessions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"))
+    board: Mapped[str] = mapped_column(Text, nullable=False)
+    opened: Mapped[str] = mapped_column(Text, nullable=False, default="[]")
+    gold_in_session: Mapped[int] = mapped_column(Integer, default=0)
+    opens_count: Mapped[int] = mapped_column(Integer, default=0)
+    status: Mapped[str] = mapped_column(String(16), default="active")
+    started_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

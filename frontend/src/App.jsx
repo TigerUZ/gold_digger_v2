@@ -4,6 +4,8 @@ import "./App.css";
 
 import Navbar from "./components/Navbar.jsx";
 import GamePage from "./pages/GamePage.jsx";
+import ArcadePage from "./pages/ArcadePage.jsx";
+import MinesPage from "./pages/MinesPage.jsx";
 import EarningsPage from "./pages/EarningsPage.jsx";
 import FriendsPage from "./pages/FriendsPage.jsx";
 import WalletPage from "./pages/WalletPage.jsx";
@@ -113,10 +115,24 @@ function App() {
         <AudioRouter />
         <Routes>
           <Route path="/" element={<StartPage />} />
+          <Route path="/arcade" element={<ArcadePage />} />
           <Route
-            path="/game"
+            path="/mole"
             element={
               <GamePage
+                header_info={header_info}
+                apiFetch={apiFetch}
+                user={user}
+                refreshUser={refreshUser}
+                nextLifeIn={nextLifeIn}
+              />
+            }
+          />
+          <Route path="/game" element={<Navigate to="/mole" replace />} />
+          <Route
+            path="/mines"
+            element={
+              <MinesPage
                 header_info={header_info}
                 apiFetch={apiFetch}
                 user={user}

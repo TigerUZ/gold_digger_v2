@@ -34,8 +34,8 @@ def test_regenerates_life_after_three_hours():
 
     remaining = _sync_lives(mech, now)
 
-    assert mech.lives == 3
-    assert remaining == REGEN_SECONDS
+    assert mech.lives == MAX_LIVES
+    assert remaining == 0
 
 
 def test_regenerates_multiple_lives_when_elapsed_long_enough():
@@ -45,5 +45,5 @@ def test_regenerates_multiple_lives_when_elapsed_long_enough():
 
     remaining = _sync_lives(mech, now)
 
-    assert mech.lives == 3
-    assert 0 < remaining <= REGEN_SECONDS
+    assert mech.lives == MAX_LIVES
+    assert remaining == 0

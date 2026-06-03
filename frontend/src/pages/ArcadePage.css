@@ -1,0 +1,94 @@
+.arcade-page .page-background__content {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 1rem 6rem;
+  box-sizing: border-box;
+}
+
+.arcade-page__inner {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  margin-top: 8vh;
+}
+
+.arcade-page__title {
+  margin: 0;
+  text-align: center;
+  font-size: 1.35rem;
+  color: #fff8e1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.arcade-games {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.arcade-game-card {
+  width: 100%;
+  border: none;
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  background: rgba(45, 32, 18, 0.75);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35), inset 0 0 0 2px rgba(255, 215, 100, 0.35);
+  position: relative;
+}
+
+.arcade-game-card:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.arcade-game-card--soon {
+  opacity: 0.85;
+}
+
+.arcade-game-card__icon {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+}
+
+.arcade-game-card__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff8e1;
+}
+
+.arcade-game-card__badge {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.45rem;
+  border-radius: 8px;
+  background: rgba(120, 80, 20, 0.9);
+  color: #fde68a;
+}
+
+.arcade-back-btn {
+  margin-top: 0.5rem;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff8e1;
+  font-size: 1rem;
+  cursor: pointer;
+}

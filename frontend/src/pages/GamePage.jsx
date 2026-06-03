@@ -82,7 +82,7 @@ function GamePage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
     setIsPlaying(false);
 
     try {
-      await apiFetch("/game/finish", {
+      await apiFetch("/mole/finish", {
         method: "POST",
         body: JSON.stringify({ score: finalScore }),
       });
@@ -101,7 +101,7 @@ function GamePage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
     finishingRef.current = false;
 
     try {
-      await apiFetch("/game/start", { method: "POST" });
+      await apiFetch("/mole/start", { method: "POST" });
       await refreshUser();
     } catch (e) {
       const wait = e?.body?.next_life_in_seconds || e?.body?.detail?.next_life_in_seconds;
@@ -164,7 +164,7 @@ function GamePage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
 
   return (
     <PageBackground image={BACKGROUNDS.game} className="home_main_page" blur>
-      <Header header_info={header_info} title="Home" />
+      <Header header_info={header_info} title="Крот" />
       <div className="space-for-header" />
 
       <div className="game-ui">

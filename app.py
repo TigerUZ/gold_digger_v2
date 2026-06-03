@@ -10,6 +10,7 @@ import logging
 from telegram_bot import bot, dp
 
 from auth.router import router as auth_router
+from auth.mines import router as mines_router
 
 
 @asynccontextmanager
@@ -38,6 +39,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router)
+app.include_router(mines_router)
 app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
 app.mount("/img", StaticFiles(directory="frontend/dist/img"), name="img")
 app.mount("/sounds", StaticFiles(directory="frontend/dist/sounds"), name="sounds")
