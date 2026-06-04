@@ -144,7 +144,9 @@ async def create_user_in_db(user_data: WebAppInitData, session: SessionDep) -> U
     new_game_mechanic = GameMechanic(
         user_id=new_user.id,
         user=new_user,
-        lives=5,
+        lives=3,
+        mole_lives=3,
+        mines_lives=3,
         last_round_played_at=None,
     )
 

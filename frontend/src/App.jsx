@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import "./App.css";
 
 import Navbar from "./components/Navbar.jsx";
@@ -29,10 +29,14 @@ function getTelegramInitData() {
   return "";
 }
 
-function App() {
+function AppRoutes() {
+  const location = useLocation();
   const [initData, setInitData] = useState("");
   const [user, setUser] = useState(null);
-  const [nextLifeIn, setNextLifeIn] = useState(0);
+  const [moleNextLifeIn, setMoleNextLifeIn] = useState(0);
+  const [minesNextLifeIn, setMinesNextLifeIn] = useState(0);
+  const isMinesRoute = location.pathname === "/mines";
+  const nextLifeIn = isMinesRoute ? minesNextLifeIn : moleNextLifeIn;
 
   useEffect(() => {
     setInitData(getTelegramInitData());
@@ -68,7 +72,8 @@ function App() {
     if (!initData) return;
     const me = await apiFetch("/me", { method: "GET" });
     setUser(me.user);
-    setNextLifeIn(me.next_life_in_seconds);
+    setMoleNextLifeIn(me.mole_next_life_in_seconds ?? me.next_life_in_seconds ?? 0);
+    setMinesNextLifeIn(me.mines_next_life_in_seconds ?? 0);
   }, [apiFetch, initData]);
 
   // Initial auth + load user
@@ -96,22 +101,17 @@ function App() {
   const header_info = useMemo(() => {
     const h = JSON.parse(JSON.stringify(headersTemplate));
     if (user?.game_mechanic) {
-      h.Home.left.value = user.game_mechanic.lives;
-      h.Home.middle.score = user.game_mechanic.total_gold;
-      // right side: minutes to next life (or 0)
-      if (nextLifeIn && nextLifeIn > 0) {
-        const mins = Math.ceil(nextLifeIn / 60);
-        h.Home.right.value = mins;
-      } else {
-        h.Home.right.value = 0;
-      }
+      const gm = user.game_mechanic;
+      h.Home.left.value = isMinesRoute ? (gm.mines_lives ?? gm.lives) : (gm.mole_lives ?? gm.lives);
+      h.Home.middle.score = gm.total_gold;
+      const wait = isMinesRoute ? minesNextLifeIn : moleNextLifeIn;
+      h.Home.right.value = wait > 0 ? Math.ceil(wait / 60) : 0;
     }
     return h;
-  }, [user, nextLifeIn]);
+  }, [user, isMinesRoute, moleNextLifeIn, minesNextLifeIn]);
 
   return (
-    <TelegramGate>
-      <Router>
+    <>
         <AudioRouter />
         <Routes>
           <Route path="/" element={<StartPage />} />
@@ -152,6 +152,15 @@ function App() {
         </Routes>
         <Navbar />
         <SoundToggle />
+    </>
+  );
+}
+
+function App() {
+  return (
+    <TelegramGate>
+      <Router>
+        <AppRoutes />
       </Router>
     </TelegramGate>
   );

@@ -34,7 +34,7 @@ function GamePage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
   const activeHoleRef = useRef(null);
 
   const holes = useMemo(() => Array.from({ length: 9 }, (_, i) => i), []);
-  const lives = user?.game_mechanic?.lives ?? 0;
+  const lives = user?.game_mechanic?.mole_lives ?? user?.game_mechanic?.lives ?? 0;
   const noLives = !isPlaying && lives <= 0;
 
   useEffect(() => {
@@ -180,7 +180,7 @@ function GamePage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
             </div>
             <div className="game-stat">
               <span className="label">Жизни</span>
-              <span className="value">{user?.game_mechanic?.lives ?? "-"}</span>
+              <span className="value">{lives}</span>
             </div>
           </div>
 

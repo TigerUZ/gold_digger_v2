@@ -10,6 +10,7 @@ from database import SessionDep
 from models import GameMechanic, Referral, User
 from auth.bot_info import build_referral_link, get_bot_username
 from auth.schemas import UserSchema
+from auth.lives import MAX_LIVES, REGEN_SECONDS, sync_all_lives, sync_mole_lives
 from auth.utils import (
     create_referral_code,
     create_user_in_db,
@@ -20,10 +21,6 @@ from auth.utils import (
 
 
 router = APIRouter()
-
-# Game / energy rules
-MAX_LIVES = 3
-REGEN_SECONDS = 3 * 60 * 60  # 3 hours
 
 # Daily bonus
 DAILY_BONUS_REWARDS = [10, 15, 20, 25, 30, 35, 40]
@@ -40,37 +37,13 @@ def _to_naive_utc(dt: datetime | None) -> datetime | None:
     return dt
 
 
+def _sync_mole_lives(mech: GameMechanic, now: datetime) -> int:
+    return sync_mole_lives(mech, _to_naive_utc(now) or utcnow_naive())
+
+
 def _sync_lives(mech: GameMechanic, now: datetime) -> int:
-    """Synchronize lives and return seconds until next life (0 if none)."""
-    now = _to_naive_utc(now) or utcnow_naive()
-    mech.last_round_played_at = _to_naive_utc(mech.last_round_played_at)
-
-    # Full lives: stop timer
-    if mech.lives >= MAX_LIVES:
-        mech.lives = MAX_LIVES
-        mech.last_round_played_at = None
-        return 0
-
-    # Timer not running but not full -> start timer from now (safety)
-    if mech.last_round_played_at is None:
-        mech.last_round_played_at = now
-
-    elapsed = (now - mech.last_round_played_at).total_seconds()
-    if elapsed < 0:
-        elapsed = 0
-
-    gained = int(elapsed // REGEN_SECONDS)
-    if gained > 0:
-        mech.lives = min(MAX_LIVES, mech.lives + gained)
-        mech.last_round_played_at = mech.last_round_played_at + timedelta(seconds=gained * REGEN_SECONDS)
-        if mech.lives >= MAX_LIVES:
-            mech.lives = MAX_LIVES
-            mech.last_round_played_at = None
-            return 0
-        elapsed = (now - mech.last_round_played_at).total_seconds()
-
-    remaining = REGEN_SECONDS - (elapsed % REGEN_SECONDS)
-    return int(max(0, remaining))
+    """Backward-compatible alias: mole lives timer."""
+    return _sync_mole_lives(mech, now)
 
 
 def _sync_daily_bonus(mech: GameMechanic, now: datetime) -> tuple[bool, int]:
@@ -98,7 +71,9 @@ def _get_init_data_from_headers(request: Request) -> str:
     return init_data
 
 
-async def _get_current_user(request: Request, session: SessionDep) -> tuple[User, GameMechanic, int]:
+async def _get_current_user(
+    request: Request, session: SessionDep
+) -> tuple[User, GameMechanic, int, int]:
     init_data = _get_init_data_from_headers(request)
     data = await verify_telegram_init_data(init_data)
     if data.user is None:
@@ -115,17 +90,23 @@ async def _get_current_user(request: Request, session: SessionDep) -> tuple[User
     mech = user.game_mechanic
     if mech is None:
         # safety: create mechanic if missing
-        mech = GameMechanic(user_id=user.id, lives=MAX_LIVES)
+        mech = GameMechanic(
+            user_id=user.id,
+            lives=MAX_LIVES,
+            mole_lives=MAX_LIVES,
+            mines_lives=MAX_LIVES,
+        )
         session.add(mech)
         await session.commit()
         await session.refresh(user)
         user = await get_user_from_db(user.id, session)
         mech = user.game_mechanic
 
-    next_life_in = _sync_lives(mech, utcnow_naive())
+    now = utcnow_naive()
+    mole_next, mines_next = sync_all_lives(mech, now)
     session.add(mech)
     await session.commit()
-    return user, mech, next_life_in
+    return user, mech, mole_next, mines_next
 
 
 class AuthRequest(BaseModel):
@@ -136,6 +117,8 @@ class MeResponse(BaseModel):
     user: UserSchema
     max_lives: int
     next_life_in_seconds: int
+    mole_next_life_in_seconds: int
+    mines_next_life_in_seconds: int
 
 
 class StartRoundResponse(BaseModel):
@@ -189,6 +172,7 @@ class WalletResponse(BaseModel):
     games_played: int
     best_score: int
     lives: int
+    mines_lives: int
     max_lives: int
     referral_earned: int
 
@@ -208,13 +192,18 @@ async def auth_webapp(payload: AuthRequest, session: SessionDep):
 
     mech = user.game_mechanic
     if mech is None:
-        mech = GameMechanic(user_id=user.id, lives=MAX_LIVES)
+        mech = GameMechanic(
+            user_id=user.id,
+            lives=MAX_LIVES,
+            mole_lives=MAX_LIVES,
+            mines_lives=MAX_LIVES,
+        )
         session.add(mech)
         await session.commit()
         user = await get_user_from_db(user.id, session)
         mech = user.game_mechanic
 
-    _sync_lives(mech, utcnow_naive())
+    sync_all_lives(mech, utcnow_naive())
     session.add(mech)
     await session.commit()
 
@@ -224,32 +213,37 @@ async def auth_webapp(payload: AuthRequest, session: SessionDep):
 
 @router.get("/me", response_model=MeResponse)
 async def me(request: Request, session: SessionDep):
-    user, mech, next_life_in = await _get_current_user(request, session)
-    return MeResponse(user=UserSchema.model_validate(user), max_lives=MAX_LIVES, next_life_in_seconds=next_life_in)
+    user, mech, mole_next, mines_next = await _get_current_user(request, session)
+    return MeResponse(
+        user=UserSchema.model_validate(user),
+        max_lives=MAX_LIVES,
+        next_life_in_seconds=mole_next,
+        mole_next_life_in_seconds=mole_next,
+        mines_next_life_in_seconds=mines_next,
+    )
 
 
 async def _start_mole_round(request: Request, session: SessionDep) -> StartRoundResponse:
-    user, mech, next_life_in = await _get_current_user(request, session)
+    user, mech, mole_next, _ = await _get_current_user(request, session)
 
-    if mech.lives <= 0:
+    if mech.mole_lives <= 0:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "No lives left", "next_life_in_seconds": next_life_in},
+            detail={"message": "No lives left", "next_life_in_seconds": mole_next},
         )
 
-    # Spend 1 life
-    was_full = mech.lives >= MAX_LIVES
-    mech.lives -= 1
+    was_full = mech.mole_lives >= MAX_LIVES
+    mech.mole_lives -= 1
+    mech.lives = mech.mole_lives
 
-    # Start regen timer when we go from full -> not full
-    if was_full and mech.last_round_played_at is None:
-        mech.last_round_played_at = utcnow_naive()
+    if was_full and mech.mole_last_round_played_at is None:
+        mech.mole_last_round_played_at = utcnow_naive()
 
-    next_life_in = _sync_lives(mech, utcnow_naive())
+    mole_next = _sync_mole_lives(mech, utcnow_naive())
     session.add(mech)
     await session.commit()
 
-    return StartRoundResponse(lives=mech.lives, max_lives=MAX_LIVES, next_life_in_seconds=next_life_in)
+    return StartRoundResponse(lives=mech.mole_lives, max_lives=MAX_LIVES, next_life_in_seconds=mole_next)
 
 
 @router.post("/mole/start", response_model=StartRoundResponse)
@@ -263,7 +257,7 @@ async def game_start(request: Request, session: SessionDep):
 
 
 async def _finish_mole_round(request: Request, payload: FinishRoundRequest, session: SessionDep):
-    user, mech, _ = await _get_current_user(request, session)
+    user, mech, _, _ = await _get_current_user(request, session)
     score = int(payload.score)
 
     mech.total_gold += score
@@ -294,7 +288,7 @@ async def game_finish(request: Request, payload: FinishRoundRequest, session: Se
 
 @router.get("/earnings", response_model=EarningsResponse)
 async def earnings(request: Request, session: SessionDep):
-    user, mech, _ = await _get_current_user(request, session)
+    user, mech, _, _ = await _get_current_user(request, session)
 
     referral_sum_q = select(func.coalesce(func.sum(Referral.referral_gain_gold), 0)).where(
         Referral.referral_master_id == user.id
@@ -314,7 +308,7 @@ async def earnings(request: Request, session: SessionDep):
 
 @router.get("/daily-bonus", response_model=DailyBonusResponse)
 async def daily_bonus_status(request: Request, session: SessionDep):
-    _, mech, _ = await _get_current_user(request, session)
+    _, mech, _, _ = await _get_current_user(request, session)
     now = utcnow_naive()
     can_claim, next_in = _sync_daily_bonus(mech, now)
     session.add(mech)
@@ -330,7 +324,7 @@ async def daily_bonus_status(request: Request, session: SessionDep):
 
 @router.post("/daily-bonus/claim", response_model=DailyBonusClaimResponse)
 async def daily_bonus_claim(request: Request, session: SessionDep):
-    _, mech, _ = await _get_current_user(request, session)
+    _, mech, _, _ = await _get_current_user(request, session)
     now = utcnow_naive()
     can_claim, next_in = _sync_daily_bonus(mech, now)
 
@@ -370,7 +364,7 @@ async def public_bot_info():
 
 @router.get("/friends", response_model=FriendsResponse)
 async def friends(request: Request, session: SessionDep):
-    user, _, _ = await _get_current_user(request, session)
+    user, _, _, _ = await _get_current_user(request, session)
 
     if not user.referral_code:
         user.referral_code = await create_referral_code()
@@ -410,7 +404,7 @@ async def friends(request: Request, session: SessionDep):
 
 @router.get("/wallet", response_model=WalletResponse)
 async def wallet(request: Request, session: SessionDep):
-    user, mech, _ = await _get_current_user(request, session)
+    user, mech, _, _ = await _get_current_user(request, session)
 
     referral_sum_q = select(func.coalesce(func.sum(Referral.referral_gain_gold), 0)).where(
         Referral.referral_master_id == user.id
@@ -421,7 +415,8 @@ async def wallet(request: Request, session: SessionDep):
         balance=mech.total_gold,
         games_played=mech.rounds_played,
         best_score=mech.best_round_gold,
-        lives=mech.lives,
+        lives=mech.mole_lives,
+        mines_lives=mech.mines_lives,
         max_lives=MAX_LIVES,
         referral_earned=int(referral_sum),
     )

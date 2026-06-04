@@ -28,6 +28,7 @@ export default function ArcadePage() {
 
   return (
     <PageBackground image={ARCADE_BG} className="arcade-page" overlay={false}>
+      <h1 className="arcade-page__title">Выберите игру</h1>
       <ul className="arcade-menu" aria-label="Выбор игры">
         {ARCADE_GAMES.map((game) => (
           <li key={game.id} className="arcade-menu__item">

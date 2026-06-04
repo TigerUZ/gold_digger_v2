@@ -12,6 +12,7 @@ const SFX = {
   minesEmpty: { src: "/sounds/mines-empty.mp3", volume: 0.4 },
   minesGold: { src: "/sounds/mines-gold.mp3", volume: 0.5 },
   minesMine: { src: "/sounds/mines-mine.mp3", volume: 0.55 },
+  minesCashout: { src: "/sounds/mines-cashout.mp3", volume: 0.5 },
 };
 
 class AudioManager {
@@ -240,6 +241,23 @@ class AudioManager {
     }
   }
 
+  playOneShotWithFallback(primary, fallback) {
+    if (!this.unlocked || !this.enabled) return;
+    const audio = new Audio(primary.src);
+    audio.volume = primary.volume;
+    const playPromise = audio.play();
+    if (playPromise?.catch) {
+      playPromise.catch(() => this.playOneShot(fallback));
+    }
+    audio.addEventListener(
+      "error",
+      () => {
+        this.playOneShot(fallback);
+      },
+      { once: true }
+    );
+  }
+
   hapticImpact(style = "medium") {
     try {
       window.Telegram?.WebApp?.HapticFeedback?.impactOccurred(style);
@@ -259,17 +277,25 @@ class AudioManager {
     }, 90);
   }
 
-  playMinesReveal(result) {
-    if (result === "mine") {
+  playMinesReveal(data) {
+    const result = data?.result;
+    const goldValue = data?.gold_value ?? 0;
+    if (result === "mine" || data?.status === "exploded") {
       this.playOneShot(SFX.minesMine);
       this.hapticImpact("heavy");
-    } else if (result === "gold") {
-      this.playOneShot(SFX.minesGold);
+    } else if (result === "gold" || goldValue > 0) {
+      this.playOneShotWithFallback(SFX.minesGold, SFX.coin);
       this.hapticImpact("light");
-    } else if (result === "empty") {
+    } else if (result === "empty" || result === "timeout") {
       this.playOneShot(SFX.minesEmpty);
       this.hapticImpact("soft");
     }
+  }
+
+  playMinesCashout() {
+    this.playOneShot(SFX.minesCashout);
+    this.playCoin();
+    this.hapticImpact("medium");
   }
 }
 

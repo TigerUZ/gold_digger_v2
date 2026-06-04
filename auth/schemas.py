@@ -6,6 +6,8 @@ class GameMechanicSchema(BaseModel):
     user_id: int
     total_gold: int
     lives: int
+    mole_lives: int
+    mines_lives: int
     rounds_played: int
     best_round_gold: int
     last_round_played_at: datetime | None

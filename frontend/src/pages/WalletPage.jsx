@@ -7,7 +7,8 @@ import { BACKGROUNDS } from "../assets/backgrounds.js";
 const WALLET_ROWS = [
   { key: "best_score", label: "Лучший раунд" },
   { key: "games_played", label: "Игр сыграно" },
-  { key: "lives", label: "Жизни", format: (d) => `${d.lives ?? 0}/${d.max_lives ?? 5}` },
+  { key: "lives", label: "Жизни (крот)", format: (d) => `${d.lives ?? 0}/${d.max_lives ?? 3}` },
+  { key: "mines_lives", label: "Жизни (сокровища)", format: (d) => `${d.mines_lives ?? 0}/${d.max_lives ?? 3}` },
   { key: "referral_earned", label: "Реферальный доход" },
 ];
 
@@ -24,7 +25,8 @@ function WalletPage({ header_info, apiFetch }) {
         games_played: 0,
         best_score: 0,
         lives: 0,
-        max_lives: 5,
+        mines_lives: 0,
+        max_lives: 3,
         referral_earned: 0,
       });
     }

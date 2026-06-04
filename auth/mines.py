@@ -9,7 +9,8 @@ from fastapi import APIRouter, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 
-from auth.router import MAX_LIVES, _get_current_user, _sync_lives
+from auth.lives import MAX_LIVES, sync_mines_lives
+from auth.router import _get_current_user
 from auth.utils import utcnow_naive
 from database import SessionDep
 from models import GameMechanic, MinesSession
@@ -143,12 +144,12 @@ class MinesCashoutRequest(BaseModel):
 
 @router.post("/mines/start", response_model=MinesStartResponse)
 async def mines_start(request: Request, session: SessionDep):
-    user, mech, next_life_in = await _get_current_user(request, session)
+    user, mech, _, mines_next = await _get_current_user(request, session)
 
-    if mech.lives <= 0:
+    if mech.mines_lives <= 0:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "No lives left", "next_life_in_seconds": next_life_in},
+            detail={"message": "No lives left", "next_life_in_seconds": mines_next},
         )
 
     now = utcnow_naive()
@@ -161,14 +162,14 @@ async def mines_start(request: Request, session: SessionDep):
         else:
             board = json.loads(active.board)
             opened = _parse_opened(active.opened)
-            next_life_in = _sync_lives(mech, now)
+            mines_next = sync_mines_lives(mech, now)
             session.add(mech)
             await session.commit()
             return MinesStartResponse(
                 session_id=active.id,
-                lives=mech.lives,
+                lives=mech.mines_lives,
                 max_lives=MAX_LIVES,
-                next_life_in_seconds=next_life_in,
+                next_life_in_seconds=mines_next,
                 seconds_left=_seconds_left(active, now),
                 max_opens=MINES_MAX_OPENS,
                 resumed=True,
@@ -177,10 +178,10 @@ async def mines_start(request: Request, session: SessionDep):
                 opened_preview=_opened_preview(board, opened),
             )
 
-    was_full = mech.lives >= MAX_LIVES
-    mech.lives -= 1
-    if was_full and mech.last_round_played_at is None:
-        mech.last_round_played_at = now
+    was_full = mech.mines_lives >= MAX_LIVES
+    mech.mines_lives -= 1
+    if was_full and mech.mines_last_round_played_at is None:
+        mech.mines_last_round_played_at = now
 
     board = generate_board()
     mines = MinesSession(
@@ -197,15 +198,15 @@ async def mines_start(request: Request, session: SessionDep):
     session.add(mech)
     await session.commit()
 
-    next_life_in = _sync_lives(mech, utcnow_naive())
+    mines_next = sync_mines_lives(mech, utcnow_naive())
     session.add(mech)
     await session.commit()
 
     return MinesStartResponse(
         session_id=mines.id,
-        lives=mech.lives,
+        lives=mech.mines_lives,
         max_lives=MAX_LIVES,
-        next_life_in_seconds=next_life_in,
+        next_life_in_seconds=mines_next,
         seconds_left=MINES_ROUND_SECONDS,
         max_opens=MINES_MAX_OPENS,
     )
@@ -213,7 +214,7 @@ async def mines_start(request: Request, session: SessionDep):
 
 @router.post("/mines/reveal", response_model=MinesRevealResponse)
 async def mines_reveal(request: Request, payload: MinesRevealRequest, session: SessionDep):
-    user, mech, _ = await _get_current_user(request, session)
+    user, mech, _, _ = await _get_current_user(request, session)
     now = utcnow_naive()
 
     mines = await session.get(MinesSession, payload.session_id)
@@ -292,7 +293,7 @@ async def mines_reveal(request: Request, payload: MinesRevealRequest, session: S
 
 @router.post("/mines/forfeit", response_model=MinesRevealResponse)
 async def mines_forfeit(request: Request, payload: MinesCashoutRequest, session: SessionDep):
-    user, mech, _ = await _get_current_user(request, session)
+    user, mech, _, _ = await _get_current_user(request, session)
     mines = await session.get(MinesSession, payload.session_id)
     if not mines or mines.user_id != user.id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
@@ -316,7 +317,7 @@ async def mines_forfeit(request: Request, payload: MinesCashoutRequest, session:
 
 @router.post("/mines/cashout", response_model=MinesRevealResponse)
 async def mines_cashout(request: Request, payload: MinesCashoutRequest, session: SessionDep):
-    user, mech, _ = await _get_current_user(request, session)
+    user, mech, _, _ = await _get_current_user(request, session)
     now = utcnow_naive()
 
     mines = await session.get(MinesSession, payload.session_id)

@@ -54,9 +54,13 @@ class GameMechanic(Base):
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     total_gold: Mapped[int] = mapped_column(Integer, default=0)
     lives: Mapped[int] = mapped_column(Integer, default=3)
+    mole_lives: Mapped[int] = mapped_column(Integer, default=3)
+    mines_lives: Mapped[int] = mapped_column(Integer, default=3)
     rounds_played: Mapped[int] = mapped_column(Integer, default=0)
     best_round_gold: Mapped[int] = mapped_column(Integer, default=0)
     last_round_played_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    mole_last_round_played_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    mines_last_round_played_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     daily_bonus_step: Mapped[int] = mapped_column(Integer, default = 0)
     daily_bonus_last_taken_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 

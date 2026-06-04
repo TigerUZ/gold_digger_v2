@@ -37,7 +37,7 @@ function MinesPage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
   const sessionIdRef = useRef(null);
   const sessionGoldRef = useRef(0);
 
-  const lives = user?.game_mechanic?.lives ?? 0;
+  const lives = user?.game_mechanic?.mines_lives ?? user?.game_mechanic?.lives ?? 0;
   const noLives = !isPlaying && lives <= 0;
 
   useEffect(() => {
@@ -99,6 +99,9 @@ function MinesPage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
 
   const handleSessionEnd = useCallback(
     async (data) => {
+      if ((data.awarded ?? 0) > 0) {
+        audio.playMinesCashout();
+      }
       const msg = finishMessage(data);
       if (msg) setMessage(msg);
       endPlaying();
@@ -218,9 +221,7 @@ function MinesPage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
         body: JSON.stringify({ session_id: sid, cell: index }),
       });
       applyReveal(index, data);
-      if (data.result === "mine" || data.result === "gold" || data.result === "empty") {
-        audio.playMinesReveal(data.result);
-      }
+      audio.playMinesReveal(data);
 
       if (data.status === "exploded" || data.status === "finished") {
         await handleSessionEnd(data);

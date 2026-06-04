@@ -5,16 +5,35 @@
   padding-bottom: 5.5rem;
 }
 
+.arcade-page__title {
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  transform: translateX(-50%);
+  margin: 0;
+  width: min(92vw, 360px);
+  text-align: center;
+  font-size: clamp(1.15rem, 4.5vw, 1.45rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff8e1;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.75),
+    0 0 12px rgba(255, 200, 80, 0.35);
+  pointer-events: none;
+  z-index: 2;
+}
+
 .arcade-menu {
   list-style: none;
   margin: 0;
   padding: 0;
   position: absolute;
   left: 50%;
-  top: 22%;
+  top: 24%;
   transform: translateX(-50%);
   width: min(90vw, 340px);
-  height: 62%;
+  height: 58%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
