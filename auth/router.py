@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, Request, status
 from pydantic import BaseModel, Field
@@ -10,7 +10,7 @@ from database import SessionDep
 from models import GameMechanic, Referral, User
 from auth.bot_info import build_referral_link, get_bot_username
 from auth.schemas import UserSchema
-from auth.lives import MAX_LIVES, REGEN_SECONDS, sync_all_lives, sync_mole_lives
+from auth.lives import MAX_LIVES, sync_all_lives, sync_mole_lives
 from auth.utils import (
     create_referral_code,
     create_user_in_db,
