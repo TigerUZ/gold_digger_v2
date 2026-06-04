@@ -3,6 +3,7 @@ const STORAGE_KEY = "gd_sound_enabled";
 const MUSIC = {
   menu: { src: "/sounds/menu-loop.mp3", volume: 0.32 },
   game: { src: "/sounds/game-loop.mp3", volume: 0.38 },
+  mines: { src: "/sounds/mines-loop.mp3", volume: 0.38 },
 };
 
 const SFX = {
@@ -16,6 +17,7 @@ class AudioManager {
     this.enabled = localStorage.getItem(STORAGE_KEY) !== "false";
     this.menuMusic = null;
     this.gameMusic = null;
+    this.minesMusic = null;
     this.activeTrack = null;
     this.suspendedByVisibility = false;
     this.listeners = new Set();
@@ -60,7 +62,8 @@ class AudioManager {
   isMusicPlaying() {
     return Boolean(
       (this.menuMusic && !this.menuMusic.paused) ||
-        (this.gameMusic && !this.gameMusic.paused)
+        (this.gameMusic && !this.gameMusic.paused) ||
+        (this.minesMusic && !this.minesMusic.paused)
     );
   }
 
@@ -115,6 +118,7 @@ class AudioManager {
     this.unlocked = true;
     this.menuMusic = this.createLoop(MUSIC.menu);
     this.gameMusic = this.createLoop(MUSIC.game);
+    this.minesMusic = this.createLoop(MUSIC.mines);
     this.notify();
   }
 
@@ -144,18 +148,37 @@ class AudioManager {
     }
   }
 
+  pauseOtherGameTracks(except) {
+    if (except !== "game") {
+      this.pause(this.gameMusic, false);
+    }
+    if (except !== "mines") {
+      this.pause(this.minesMusic, false);
+    }
+    if (except !== "menu") {
+      this.pause(this.menuMusic, false);
+    }
+  }
+
   playMenuMusic() {
     this.activeTrack = "menu";
     if (!this.unlocked || !this.enabled) return;
-    this.pause(this.gameMusic, false);
+    this.pauseOtherGameTracks("menu");
     this.safePlay(this.menuMusic);
   }
 
   playGameMusic() {
     this.activeTrack = "game";
     if (!this.unlocked || !this.enabled) return;
-    this.pause(this.menuMusic, false);
+    this.pauseOtherGameTracks("game");
     this.safePlay(this.gameMusic);
+  }
+
+  playMinesMusic() {
+    this.activeTrack = "mines";
+    if (!this.unlocked || !this.enabled) return;
+    this.pauseOtherGameTracks("mines");
+    this.safePlay(this.minesMusic);
   }
 
   stopMenuMusic() {
@@ -172,14 +195,24 @@ class AudioManager {
     }
   }
 
+  stopMinesMusic() {
+    this.pause(this.minesMusic, true);
+    if (this.activeTrack === "mines") {
+      this.activeTrack = null;
+    }
+  }
+
   muteAll() {
     this.pause(this.menuMusic, false);
     this.pause(this.gameMusic, false);
+    this.pause(this.minesMusic, false);
   }
 
   resumeActive() {
     if (!this.unlocked || !this.enabled) return;
-    if (this.activeTrack === "game") {
+    if (this.activeTrack === "mines") {
+      this.safePlay(this.minesMusic);
+    } else if (this.activeTrack === "game") {
       this.safePlay(this.gameMusic);
     } else if (this.activeTrack === "menu") {
       this.safePlay(this.menuMusic);
@@ -189,6 +222,7 @@ class AudioManager {
   stopAll() {
     this.stopMenuMusic();
     this.stopGameMusic();
+    this.stopMinesMusic();
   }
 
   playOneShot({ src, volume }) {

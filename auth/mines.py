@@ -8,7 +8,6 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
-from sqlalchemy.exc import SQLAlchemyError
 
 from auth.router import MAX_LIVES, _get_current_user, _sync_lives
 from auth.utils import utcnow_naive
@@ -144,18 +143,6 @@ class MinesCashoutRequest(BaseModel):
 
 @router.post("/mines/start", response_model=MinesStartResponse)
 async def mines_start(request: Request, session: SessionDep):
-    try:
-        return await _mines_start_impl(request, session)
-    except SQLAlchemyError:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail={
-                "message": "База не обновлена (нет таблицы mines_sessions). Запустите миграции на сервере.",
-            },
-        ) from None
-
-
-async def _mines_start_impl(request: Request, session: SessionDep) -> MinesStartResponse:
     user, mech, next_life_in = await _get_current_user(request, session)
 
     if mech.lives <= 0:
