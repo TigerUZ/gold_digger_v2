@@ -1,6 +1,6 @@
-const CACHE_VERSION = "3";
+const CACHE_VERSION = "6";
 
-function icon(path) {
+function card(path) {
   return `${path}?v=${CACHE_VERSION}`;
 }
 
@@ -8,22 +8,22 @@ export const ARCADE_GAMES = [
   {
     id: "mole",
     title: "Крот",
-    icon: icon("/img/arcade/icon-mole.png"),
+    card: card("/img/arcade/icon-mole-card.png"),
     path: "/mole",
     soon: false,
   },
   {
-    id: "catch",
-    title: "Поймай золото",
-    icon: icon("/img/arcade/icon-catch.png"),
-    path: null,
-    soon: true,
-  },
-  {
     id: "mines",
     title: "Сокровища",
-    icon: icon("/img/arcade/icon-mines.png"),
+    card: card("/img/arcade/icon-mines-card.png"),
     path: "/mines",
     soon: false,
+  },
+  {
+    id: "catch",
+    title: "Золотой дождь",
+    card: card("/img/arcade/icon-catch-card.png"),
+    path: null,
+    soon: true,
   },
 ];

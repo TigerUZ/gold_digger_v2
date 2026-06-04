@@ -1,23 +1,30 @@
 .mines-page .page-background__content {
-  padding-bottom: 5rem;
+  padding-bottom: 5.5rem;
+}
+
+/* Больше отступ под шапку TOTAL SCORE — HUD не заезжает */
+.mines-page .space-for-header {
+  height: 6.25rem;
 }
 
 .mines-ui {
-  padding: 0 0.75rem 1rem;
+  margin-top: 1.5rem;
+  padding: 0 0.65rem 1rem;
   max-width: 400px;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .mines-hud {
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .mines-stat {
   flex: 1;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.5);
   border-radius: 10px;
   padding: 0.4rem 0.5rem;
   text-align: center;
@@ -36,15 +43,15 @@
   color: #fff8e1;
 }
 
+/* Сетка ниже, без лишней подложки — клетки на фоне шахты */
 .mines-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
-  margin: 0 auto 1rem;
-  max-width: min(92vw, 340px);
-  padding: 0.5rem;
-  border-radius: 12px;
-  background: rgba(30, 20, 10, 0.35);
+  gap: 5px;
+  margin: 1.25rem auto 1.1rem;
+  max-width: min(88vw, 300px);
+  padding: 0;
+  background: transparent;
 }
 
 .mines-cell {
@@ -60,6 +67,7 @@
 
 .mines-cell:disabled {
   cursor: default;
+  opacity: 0.92;
 }
 
 .mines-cell img {
@@ -67,6 +75,7 @@
   height: 100%;
   object-fit: contain;
   display: block;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
 }
 
 .mines-cell__label {
@@ -84,6 +93,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  margin-top: 0.25rem;
 }
 
 .mines-start-btn,

@@ -1,6 +1,6 @@
 // Пути к фоновым картинкам.
 // После замены файлов увеличьте CACHE_VERSION и выполните: npm run build
-const CACHE_VERSION = "12";
+const CACHE_VERSION = "13";
 
 function bg(path) {
   return `${path}?v=${CACHE_VERSION}`;

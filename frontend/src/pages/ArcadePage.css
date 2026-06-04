@@ -5,86 +5,70 @@
   padding-bottom: 5.5rem;
 }
 
-.arcade-slots {
+.arcade-menu {
   list-style: none;
   margin: 0;
   padding: 0;
   position: absolute;
   left: 50%;
-  top: 21%;
+  top: 20%;
   transform: translateX(-50%);
-  width: min(80vw, 310px);
-  height: 56%;
+  width: min(90vw, 340px);
+  height: 58%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  gap: 0.4rem;
   box-sizing: border-box;
 }
 
-.arcade-slots__item {
+.arcade-menu__item {
   flex: 1;
   min-height: 0;
   display: flex;
 }
 
-.arcade-slot {
+.arcade-menu__btn {
   flex: 1;
   width: 100%;
   margin: 0;
-  padding: 5% 8% 2%;
+  padding: 0;
   border: none;
   background: transparent;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.15rem;
-  position: relative;
+  justify-content: flex-start;
+  gap: 0.25rem;
 }
 
-.arcade-slot:active:not(:disabled) {
+.arcade-menu__btn:active:not(:disabled) {
   transform: scale(0.98);
 }
 
-.arcade-slot--soon {
-  opacity: 0.92;
-}
-
-.arcade-slot__icon {
+.arcade-menu__card {
+  width: 100%;
   flex: 1 1 auto;
-  width: auto;
-  height: auto;
-  max-width: 88%;
-  max-height: 72%;
+  min-height: 0;
   object-fit: contain;
+  display: block;
   pointer-events: none;
 }
 
-.arcade-slot__title {
+.arcade-menu__title {
   flex: 0 0 auto;
-  font-size: clamp(0.8rem, 3.2vw, 1rem);
+  font-size: clamp(0.85rem, 3.4vw, 1.05rem);
   font-weight: 800;
-  line-height: 1.1;
-  color: #3d2912;
+  line-height: 1.15;
+  color: #fff8e1;
   text-align: center;
-  text-shadow: 0 1px 0 rgba(255, 248, 220, 0.85);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
   pointer-events: none;
 }
 
-.arcade-slot__badge {
-  position: absolute;
-  top: 2%;
-  right: 5%;
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 0.15rem 0.4rem;
-  border-radius: 6px;
-  background: rgba(80, 50, 10, 0.85);
-  color: #fde68a;
-  pointer-events: none;
+.arcade-menu__btn--soon {
+  opacity: 0.95;
 }
 
 .arcade-back-btn {

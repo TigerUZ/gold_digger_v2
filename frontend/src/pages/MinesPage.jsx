@@ -195,6 +195,9 @@ function MinesPage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
         (typeof detail === "object" ? detail?.next_life_in_seconds : null);
       if (e.status === 403 && wait) {
         setMessage(`Жизни закончились. Следующая через ~${Math.ceil(wait / 60)} мин.`);
+      } else if (e.status === 503) {
+        const msg = typeof detail === "object" ? detail?.message : detail;
+        setMessage(msg || "База не обновлена на сервере. Нужна миграция.");
       } else if (e.status >= 500) {
         setMessage("Ошибка сервера. Подожди минуту и попробуй снова.");
       } else {

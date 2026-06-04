@@ -2,7 +2,7 @@ import "./ArcadePage.css";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import PageBackground from "../components/PageBackground.jsx";
-import { BACKGROUNDS } from "../assets/backgrounds.js";
+import { ARCADE_BG } from "../assets/arcadeAssets.js";
 import { ARCADE_GAMES } from "../assets/arcadeGames.js";
 import { audio } from "../utils/audioManager.js";
 
@@ -27,19 +27,18 @@ export default function ArcadePage() {
   };
 
   return (
-    <PageBackground image={BACKGROUNDS.arcade} className="arcade-page" overlay={false}>
-      <ul className="arcade-slots" aria-label="Выбор игры">
+    <PageBackground image={ARCADE_BG} className="arcade-page" overlay={false}>
+      <ul className="arcade-menu" aria-label="Выбор игры">
         {ARCADE_GAMES.map((game) => (
-          <li key={game.id} className="arcade-slots__item">
+          <li key={game.id} className="arcade-menu__item">
             <button
               type="button"
-              className={"arcade-slot" + (game.soon ? " arcade-slot--soon" : "")}
+              className={"arcade-menu__btn" + (game.soon ? " arcade-menu__btn--soon" : "")}
               onClick={() => onGameClick(game)}
               aria-label={game.title}
             >
-              <img className="arcade-slot__icon" src={game.icon} alt="" />
-              <span className="arcade-slot__title">{game.title}</span>
-              {game.soon ? <span className="arcade-slot__badge">Скоро</span> : null}
+              <img className="arcade-menu__card" src={game.card} alt="" />
+              <span className="arcade-menu__title">{game.title}</span>
             </button>
           </li>
         ))}
