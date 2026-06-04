@@ -8,7 +8,7 @@
 }
 
 .mines-ui {
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   padding: 0 0.65rem 1rem;
   max-width: 400px;
   margin-left: auto;
@@ -48,7 +48,7 @@
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 5px;
-  margin: 1.25rem auto 1.1rem;
+  margin: 1.75rem auto 1.1rem;
   max-width: min(88vw, 300px);
   padding: 0;
   background: transparent;

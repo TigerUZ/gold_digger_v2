@@ -218,6 +218,9 @@ function MinesPage({ header_info, apiFetch, user, refreshUser, nextLifeIn }) {
         body: JSON.stringify({ session_id: sid, cell: index }),
       });
       applyReveal(index, data);
+      if (data.result === "mine" || data.result === "gold" || data.result === "empty") {
+        audio.playMinesReveal(data.result);
+      }
 
       if (data.status === "exploded" || data.status === "finished") {
         await handleSessionEnd(data);

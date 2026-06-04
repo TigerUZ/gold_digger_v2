@@ -11,10 +11,10 @@
   padding: 0;
   position: absolute;
   left: 50%;
-  top: 20%;
+  top: 22%;
   transform: translateX(-50%);
   width: min(90vw, 340px);
-  height: 58%;
+  height: 62%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -69,18 +69,4 @@
 
 .arcade-menu__btn--soon {
   opacity: 0.95;
-}
-
-.arcade-back-btn {
-  position: absolute;
-  left: 50%;
-  bottom: 5.5rem;
-  transform: translateX(-50%);
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.35);
-  color: #fff8e1;
-  font-size: 0.95rem;
-  cursor: pointer;
 }

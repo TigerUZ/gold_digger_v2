@@ -9,6 +9,9 @@ const MUSIC = {
 const SFX = {
   whack: { src: "/sounds/whack.mp3", volume: 0.55 },
   coin: { src: "/sounds/coin.mp3", volume: 0.45 },
+  minesEmpty: { src: "/sounds/mines-empty.mp3", volume: 0.4 },
+  minesGold: { src: "/sounds/mines-gold.mp3", volume: 0.5 },
+  minesMine: { src: "/sounds/mines-mine.mp3", volume: 0.55 },
 };
 
 class AudioManager {
@@ -254,6 +257,19 @@ class AudioManager {
     window.setTimeout(() => {
       this.playOneShot(SFX.coin);
     }, 90);
+  }
+
+  playMinesReveal(result) {
+    if (result === "mine") {
+      this.playOneShot(SFX.minesMine);
+      this.hapticImpact("heavy");
+    } else if (result === "gold") {
+      this.playOneShot(SFX.minesGold);
+      this.hapticImpact("light");
+    } else if (result === "empty") {
+      this.playOneShot(SFX.minesEmpty);
+      this.hapticImpact("soft");
+    }
   }
 }
 

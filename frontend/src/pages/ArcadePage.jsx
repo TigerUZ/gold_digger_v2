@@ -43,9 +43,6 @@ export default function ArcadePage() {
           </li>
         ))}
       </ul>
-      <button type="button" className="arcade-back-btn" onClick={() => navigate("/")}>
-        Назад
-      </button>
     </PageBackground>
   );
 }
